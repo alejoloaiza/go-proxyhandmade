@@ -259,6 +259,7 @@ func handleConnection(conn net.Conn) {
 				Conns[i] = Conns[len(Conns)-1]
 				Conns = Conns[:len(Conns)-1]
 			}
+			recover()
 		}
 		conn.Close()
 	}()
