@@ -256,7 +256,8 @@ func handleConnection(conn net.Conn) {
 	defer func() {
 		for i, c := range Conns {
 			if c == conn {
-				Conns = append(Conns[:i], Conns[i+1:]...)
+				Conns[i] = Conns[len(Conns)-1]
+				Conns = Conns[:len(Conns)-1]
 			}
 		}
 		conn.Close()
