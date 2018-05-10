@@ -10,10 +10,12 @@ package connection
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -248,14 +250,26 @@ func PipeWhenClose(conn net.Conn, target string) {
 }
 
 func HandleConnection(conn net.Conn) {
+	var mutex = &sync.Mutex{}
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			_, ok = r.(error)
+			if !ok {
+				fmt.Errorf("pkg: %v", r)
+			}
+		}
+	}()
 	Conns = append(Conns, conn)
+
 	defer func() {
 		for i, c := range Conns {
 			if c == conn {
+				mutex.Lock()
 				Conns[i] = Conns[len(Conns)-1]
 				Conns = Conns[:len(Conns)-1]
+				mutex.Unlock()
 			}
-			recover()
 		}
 		conn.Close()
 	}()
