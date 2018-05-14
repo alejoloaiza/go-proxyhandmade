@@ -38,7 +38,7 @@ func main() {
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error in Accept: " + err.Error())
 			return
 		}
 		if connection.Verbose {

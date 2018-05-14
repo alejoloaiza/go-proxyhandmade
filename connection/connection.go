@@ -253,6 +253,7 @@ func HandleConnection(conn net.Conn) {
 	var mutex = &sync.Mutex{}
 	defer func() {
 		if r := recover(); r != nil {
+			conn.Close()
 			var ok bool
 			_, ok = r.(error)
 			if !ok {
@@ -269,9 +270,11 @@ func HandleConnection(conn net.Conn) {
 				Conns[i] = Conns[len(Conns)-1]
 				Conns = Conns[:len(Conns)-1]
 				mutex.Unlock()
+				break
 			}
 		}
 		conn.Close()
+
 	}()
 	if err := HandShake(conn); err != nil {
 		log.Println("socks handshake:", err)
